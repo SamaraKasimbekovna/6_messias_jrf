@@ -1,26 +1,55 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from rest_framework.exceptions import ValidationError
+from django.contrib.auth import authenticate
+
+from .models import CustomUser
 
 
-class UserAuthSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField()
+class RegisterSerializer(serializers.ModelSerializer):
+
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ["email", "password", "phone_number"]
+
+    def validate_email(self, value):
+
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Пользователь уже существует")
+
+        return value
+
+    def create(self, validated_data):
+
+        password = validated_data.pop("password")
+
+        user = CustomUser.objects.create_user(
+            password=password,
+            **validated_data
+        )
+
+        return user
 
 
-class UserRegisterSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField()
+class LoginSerializer(serializers.Serializer):
 
-    def validate_username(self, username):
-        try:
-            User.objects.get(username=username)
-        except User.DoesNotExist:
-            return username
+    email = serializers.EmailField()
 
-        raise ValidationError('User already exists!')
+    password = serializers.CharField(write_only=True)
 
+    def validate(self, attrs):
 
-class ConfirmSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
-    code = serializers.CharField()
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        user = authenticate(
+            username=email,
+            password=password
+        )
+
+        if not user:
+            raise serializers.ValidationError("Неверный email или пароль")
+
+        attrs["user"] = user
+
+        return attrs

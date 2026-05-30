@@ -1,14 +1,26 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+
+from .managers import CustomUserManager
 
 
-class ConfirmCode(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
     )
 
-    code = models.CharField(max_length=6)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = "email"
+
+    REQUIRED_FIELDS = ["phone_number"]
 
     def __str__(self):
-        return f'{self.user.username} - {self.code}'
+        return self.email
