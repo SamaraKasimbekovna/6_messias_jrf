@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'product',
+    'drf_yasg',
+    'drf_spectacular',
     'users',
     'rest_framework.authtoken',
 ]
@@ -44,32 +46,24 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ),
-
-    'DEFAULT_PAGINATION_CLASS':
-        'rest_framework.pagination.PageNumberPagination',
-
-    'PAGE_SIZE': 5,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        # "rest_framework.authentication.SessionAuthentication",
+    ],
+}
+QUERYCOUNT = {
+    "THRESHOLDS": {
+        "MEDIUM": 50,
+        "HIGH": 200,
+        "MIN_TIME_TO_LOG": 0,
+        "MIN_QUERY_COUNT_TO_LOG": 0,
+    },
+    "IGNORE_REQUEST_PATTERNS": [],
+    "IGNORE_SQL_PATTERNS": [],
+    "DISPLAY_DUPLICATES": None,
+    "RESPONSE_HEADER": "X-DjangoQueryCount-Count",
 }
 
-# QUERYCOUNT = {
-#     'THRESHOLDS': {
-#         'MEDIUM': 50,
-#         'HIGH': 200,
-#         'MIN_TIME_TO_LOG': 0,
-#         'MIN_QUERY_COUNT_TO_LOG': 0
-#     },
-#     'IGNORE_REQUEST_PATTERNS': [],
-#     'IGNORE_SQL_PATTERNS': [],
-#     'DISPLAY_DUPLICATES': None,
-#     'RESPONSE_HEADER': 'X-DjangoQueryCount-Count'
-# }
 
 ROOT_URLCONF = 'config.urls'
 
@@ -134,16 +128,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# SWAGGER_SETTINGS = {
-#     "SECURITY_DEFINITIONS": {
-#         "AuthToken": {
-#             "type": "apiKey",
-#             "name": "Authorization",
-#             "in": "header",
-#         }
-#     }
-# }
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "AuthToken": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    }
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
