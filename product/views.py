@@ -12,6 +12,7 @@ from .serializers import (
     ReviewValidateSerializer
 )
 from .permissions import IsModerator
+from common.validators import validate_user_age
 
 
 # ================= CATEGORY =================

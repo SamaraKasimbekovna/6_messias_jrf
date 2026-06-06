@@ -2,6 +2,24 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 
 from .models import CustomUser
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class MyTokenObtainPairSerializer(
+    TokenObtainPairSerializer
+):
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token["birthdate"] = (
+            user.birthdate.isoformat()
+            if user.birthdate
+            else None
+        )
+
+        return token
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -10,7 +28,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["email", "password", "phone_number"]
+        fields = [
+            "email",
+            "password",
+            "phone_number",
+            "birthdate"
+        ]
+        # fields = ["email", "password", "phone_number"]
 
     def validate_email(self, value):
 

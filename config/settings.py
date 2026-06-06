@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'product',
     'drf_yasg',
-    'drf_spectacular',
+    # 'drf_spectacular',
     'users',
     'rest_framework.authtoken',
 ]
@@ -47,7 +47,8 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework.authentication.TokenAuthentication",
         # "rest_framework.authentication.SessionAuthentication",
     ],
 }
